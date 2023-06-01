@@ -1,53 +1,23 @@
-@Library('java-node') _
+@Library('SharedLibraryTest') _
+
 pipeline {
     agent {
         label('master')
     }
+
     tools {
-        maven 'maven'
+        nodejs 'Node'
     }
-    environment{
+
+    environment {
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-jesusmoralesc')
-        
     }
-    
-   stages {
+
+    stages {
         stage('Read properties and checkout') {
             steps {
-                script {
-                    def file = readProperties file: 'project.properties'
-                    env.image = file['imageName']
-                    
-                }
+                WBuild()
             }
-        }
-
- stage('Test') {
-            steps {
-                  MavenCleanPackage()
-                  MavenTest()
-            }
-        }
-
-        stage('Build') {
-            steps {
-                  DockerBuild()
-            }
-        }
-    
-    
-stage('Deploy') {
-            steps {
-                  DockerHubLogin()
-                  DockerPush()
-            }
-        }
-    }
-       
-    
-    post {
-        always {
-            sh 'docker logout'
         }
     }
 }
